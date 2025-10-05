@@ -1,0 +1,526 @@
+```<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Melody Weaver</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/lucide-react@0.292.0/dist/lucide-react.js"></script>
+    <script src="https://unpkg.com/lucide-icons@0.292.0/dist/lucide.js"></script>
+
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(-45deg, #1e293b, #334155, #0f172a, #475569);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .card {
+            background-color: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        
+        .nav-item {
+            transition: all 0.2s ease-in-out;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .nav-item.active {
+            border-bottom-color: #818cf8;
+            color: #ffffff;
+        }
+
+        .nav-item:hover {
+            color: #ffffff;
+        }
+
+        .custom-select, .custom-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+        
+        .custom-range::-webkit-slider-thumb {
+            height: 16px;
+            width: 16px;
+            border-radius: 9999px;
+            background: #818cf8;
+            cursor: pointer;
+            margin-top: -5px;
+            transition: background 0.2s ease;
+        }
+        
+        .custom-range::-webkit-slider-thumb:hover {
+            background: #a5b4fc;
+        }
+        
+        .loader {
+            border: 4px solid #334155;
+            border-top: 4px solid #818cf8;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .audio-progress-bar {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            background: #475569;
+            outline: none;
+            border-radius: 3px;
+            transition: opacity 0.2s;
+        }
+
+        .audio-progress-bar::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            background: #c7d2fe;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+
+        audio {
+            display: none;
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen antialiased">
+
+    <audio id="audio-player"></audio>
+
+    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+        <header class="text-center mb-8 md:mb-12">
+            <div class="inline-flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-400"><path d="M9 18V5l12-2v13"/><path d="m9 18 12-2"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                <h1 class="text-4xl md:text-5xl font-bold tracking-tighter text-white">Melody Weaver</h1>
+            </div>
+            <p class="text-slate-400 mt-2 text-lg">Generate unique melodies from your ideas.</p>
+        </header>
+
+        <nav class="flex justify-center items-center border-b border-slate-700 mb-8">
+            <button id="nav-image" class="nav-item active text-slate-300 py-4 px-6 font-semibold flex items-center gap-2">
+                <i data-lucide="image"></i> Image to Music
+            </button>
+            <button id="nav-text" class="nav-item text-slate-300 py-4 px-6 font-semibold flex items-center gap-2">
+                <i data-lucide="file-text"></i> Text to Music
+            </button>
+            <button id="nav-hum" class="nav-item text-slate-300 py-4 px-6 font-semibold flex items-center gap-2">
+                <i data-lucide="mic"></i> Hum to Music
+            </button>
+        </nav>
+
+        <main>
+            <div id="page-image" class="space-y-6">
+                <div class="text-center">
+                    <h2 class="text-2xl font-semibold text-white">Transform Visuals into Soundscapes</h2>
+                    <p class="text-slate-400">Upload an image and watch it transform into a unique soundscape based on its colors, mood, and content.</p>
+                </div>
+                <div class="card rounded-xl p-6 md:p-8">
+                    <div id="image-dropzone" class="flex flex-col items-center justify-center w-full border-2 border-dashed border-slate-600 rounded-lg p-10 cursor-pointer hover:border-indigo-400 transition-colors">
+                        <input type="file" id="image-upload" class="hidden" accept="image/*">
+                        <i data-lucide="upload-cloud" class="w-12 h-12 text-slate-500"></i>
+                        <p id="image-upload-text" class="mt-2 text-slate-400 text-center"><span class="font-semibold text-indigo-400">Click to upload</span> or drag and drop</p>
+                        <p class="text-xs text-slate-500">SVG, PNG, JPG or GIF</p>
+                    </div>
+                </div>
+                <div id="settings-image" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                </div>
+                <button id="generate-image" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition-colors text-lg flex items-center justify-center gap-2">
+                    <i data-lucide="wand-2"></i> Weave Melody
+                </button>
+            </div>
+
+            <div id="page-text" class="hidden space-y-6">
+                <div class="text-center">
+                    <h2 class="text-2xl font-semibold text-white">Compose Music from Your Words</h2>
+                    <p class="text-slate-400">Write a story, a poem, or just a simple prompt, and hear it come to life as music.</p>
+                </div>
+                <div class="card rounded-xl p-6 md:p-8">
+                     <textarea id="text-input" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-4 text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition h-40" placeholder="e.g., A cinematic, epic score for a space battle..."></textarea>
+                </div>
+                 <div id="settings-text" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                </div>
+                <button id="generate-text" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition-colors text-lg flex items-center justify-center gap-2">
+                    <i data-lucide="wand-2"></i> Weave Melody
+                </button>
+            </div>
+
+            <div id="page-hum" class="hidden space-y-6">
+                <div class="text-center">
+                    <h2 class="text-2xl font-semibold text-white">Turn Your Hum into a Harmony</h2>
+                    <p class="text-slate-400">Record a simple tune or upload an audio file, and our engine will orchestrate it into a full harmony.</p>
+                </div>
+                 <div class="card rounded-xl p-6 md:p-8 text-center">
+                    <p class="text-slate-400 mb-4">Upload an existing audio file.</p>
+                    <div class="flex justify-center items-center gap-4">
+                        <div class="flex items-center justify-center">
+                            <label class="w-full flex flex-col items-center px-4 py-2 bg-slate-700 text-slate-300 rounded-lg shadow-lg tracking-wide uppercase border border-slate-600 cursor-pointer hover:bg-slate-600 hover:text-white transition-colors">
+                                <i data-lucide="folder-up" class="w-6 h-6"></i>
+                                <span id="hum-upload-text" class="mt-2 text-base leading-normal">Upload file</span>
+                                <input type='file' id="hum-upload" class="hidden" accept="audio/*"/>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                 <div id="settings-hum" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                 </div>
+                <button id="generate-hum" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition-colors text-lg flex items-center justify-center gap-2">
+                    <i data-lucide="wand-2"></i> Weave Melody
+                </button>
+            </div>
+
+            <div id="player-section" class="mt-10 text-center hidden">
+                <div id="loading-state">
+                    <div class="loader mx-auto"></div>
+                    <p id="loading-text" class="text-slate-400 mt-4 text-lg font-medium animate-pulse">Weaving your masterpiece...</p>
+                </div>
+                
+                <div id="player-state" class="card rounded-xl p-6 hidden">
+                    <h3 class="text-xl font-bold text-white mb-1">Your Melody is Ready!</h3>
+                    <p class="text-slate-400 mb-4" id="track-name">Generated Melody</p>
+                    <div class="flex items-center justify-center gap-4">
+                        <button id="play-pause-btn" class="bg-slate-700 hover:bg-slate-600 rounded-full p-3 transition-colors">
+                            <i id="play-icon" data-lucide="play" class="text-indigo-400 w-5 h-5"></i>
+                            <i id="pause-icon" data-lucide="pause" class="text-indigo-400 w-5 h-5 hidden"></i>
+                        </button>
+                        <div class="flex-grow flex items-center gap-3 text-sm">
+                            <span id="current-time">0:00</span>
+                            <input type="range" id="progress-bar" class="audio-progress-bar w-full" value="0" step="0.1" min="0">
+                            <span id="duration">0:00</span>
+                        </div>
+                        <a id="download-btn" href="#" download class="bg-slate-700 hover:bg-slate-600 rounded-full p-3 transition-colors hidden">
+                            <i data-lucide="download" class="text-indigo-400 w-5 h-5"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const API_BASE_URL = 'http://127.0.0.1:8000';
+
+            const navLinks = {
+                image: document.getElementById('nav-image'),
+                text: document.getElementById('nav-text'),
+                hum: document.getElementById('nav-hum'),
+            };
+
+            const pages = {
+                image: document.getElementById('page-image'),
+                text: document.getElementById('page-text'),
+                hum: document.getElementById('page-hum'),
+            };
+            
+            const generateButtons = {
+                image: document.getElementById('generate-image'),
+                text: document.getElementById('generate-text'),
+                hum: document.getElementById('generate-hum'),
+            };
+
+            const audioPlayer = document.getElementById('audio-player');
+            
+            const playerSection = document.getElementById('player-section');
+            const loadingState = document.getElementById('loading-state');
+            const loadingText = document.getElementById('loading-text');
+            const playerState = document.getElementById('player-state');
+            const trackNameEl = document.getElementById('track-name');
+            const playPauseBtn = document.getElementById('play-pause-btn');
+            const playIcon = document.getElementById('play-icon');
+            const pauseIcon = document.getElementById('pause-icon');
+            const progressBar = document.getElementById('progress-bar');
+            const currentTimeEl = document.getElementById('current-time');
+            const durationEl = document.getElementById('duration');
+            const downloadBtn = document.getElementById('download-btn');
+            
+            const imageDropzone = document.getElementById('image-dropzone');
+            const imageUpload = document.getElementById('image-upload');
+            const imageUploadText = document.getElementById('image-upload-text');
+            const textInput = document.getElementById('text-input');
+            const humUpload = document.getElementById('hum-upload');
+            const humUploadText = document.getElementById('hum-upload-text');
+
+            let currentPage = 'image';
+
+            const settingsConfig = [
+                { id: 'genre', label: 'Genre', type: 'select', options: ['Cinematic', 'Lo-fi', 'Electronic', 'Orchestral', 'Ambient'], value: 'Cinematic' },
+                { id: 'mood', label: 'Mood', type: 'select', options: ['Uplifting', 'Melancholic', 'Energetic', 'Calm', 'Mysterious'], value: 'Uplifting' },
+                { id: 'duration', label: 'Song Duration (s)', type: 'range', min: 5, max: 25, value: 10 },
+                { id: 'tempo', label: 'Tempo (BPM)', type: 'range', min: 60, max: 180, value: 120 }
+            ];
+            
+            const handleFileSelect = (file, type) => {
+                if (!file) return;
+                const fileName = file.name.length > 30 ? file.name.substring(0, 27) + '...' : file.name;
+                if (type === 'image') {
+                    imageUploadText.innerHTML = `<span class="font-semibold text-green-400">File:</span> ${fileName}`;
+                } else if (type === 'hum') {
+                    humUploadText.textContent = fileName;
+                }
+            };
+
+            const renderSettings = (containerId) => {
+                const container = document.getElementById(containerId);
+                container.innerHTML = '';
+                settingsConfig.forEach(setting => {
+                    const settingWrapper = document.createElement('div');
+                    settingWrapper.className = 'card rounded-lg p-4';
+                    
+                    let controlHtml = '';
+                    if (setting.type === 'select') {
+                        controlHtml = `
+                            <label for="${setting.id}-${containerId}" class="block text-sm font-medium text-slate-300 mb-2">${setting.label}</label>
+                            <select id="${setting.id}-${containerId}" class="custom-select w-full bg-slate-700 border border-slate-600 rounded-md p-2 focus:ring-2 focus:ring-indigo-500 transition">
+                                ${setting.options.map(opt => `<option value="${opt.toLowerCase()}" ${opt === setting.value ? 'selected' : ''}>${opt}</option>`).join('')}
+                            </select>
+                        `;
+                    } else if (setting.type === 'range') {
+                        controlHtml = `
+                            <label for="${setting.id}-${containerId}" class="block text-sm font-medium text-slate-300 mb-2">${setting.label}</label>
+                            <div class="flex items-center gap-3">
+                                <input type="range" id="${setting.id}-${containerId}" min="${setting.min}" max="${setting.max}" value="${setting.value}" class="custom-range w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                                <span class="text-sm text-slate-400 w-10 text-right" id="${setting.id}-value-${containerId}">${setting.value}</span>
+                            </div>
+                        `;
+                    }
+                    
+                    settingWrapper.innerHTML = controlHtml;
+                    container.appendChild(settingWrapper);
+
+                    if (setting.type === 'range') {
+                        const rangeInput = document.getElementById(`${setting.id}-${containerId}`);
+                        const valueSpan = document.getElementById(`${setting.id}-value-${containerId}`);
+                        rangeInput.addEventListener('input', (e) => {
+                             valueSpan.textContent = e.target.value;
+                        });
+                    }
+                });
+            }
+            
+            renderSettings('settings-image');
+            renderSettings('settings-text');
+            renderSettings('settings-hum');
+            
+            const switchPage = (pageName) => {
+                currentPage = pageName;
+                Object.keys(pages).forEach(key => {
+                    pages[key].classList.toggle('hidden', key !== pageName);
+                    navLinks[key].classList.toggle('active', key === pageName);
+                });
+                resetPlayer();
+                imageUploadText.innerHTML = `<span class="font-semibold text-indigo-400">Click to upload</span> or drag and drop`;
+                imageUpload.value = '';
+                humUploadText.textContent = 'Upload file';
+                humUpload.value = '';
+                textInput.value = '';
+            };
+
+            const formatTime = (seconds) => {
+                const minutes = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+            };
+
+            const updatePlayerUI = () => {
+                progressBar.value = audioPlayer.currentTime;
+                currentTimeEl.textContent = formatTime(audioPlayer.currentTime);
+            };
+
+            const resetPlayer = () => {
+                playerSection.classList.add('hidden');
+                loadingState.style.display = 'block';
+                playerState.classList.add('hidden');
+                downloadBtn.classList.add('hidden');
+                audioPlayer.pause();
+                audioPlayer.removeAttribute('src');
+                playIcon.classList.remove('hidden');
+                pauseIcon.classList.add('hidden');
+                loadingText.textContent = 'Weaving your masterpiece...';
+                loadingText.classList.remove('text-red-400');
+                loadingText.classList.add('text-slate-400', 'animate-pulse');
+            }
+            
+            const setupPlayer = () => {
+                progressBar.max = audioPlayer.duration;
+                durationEl.textContent = formatTime(audioPlayer.duration);
+                updatePlayerUI();
+            };
+
+            const handleGenerate = async (type) => {
+                resetPlayer();
+                playerSection.classList.remove('hidden');
+
+                const formData = new FormData();
+                const settingsContainerId = `settings-${type}`;
+                
+                formData.append('genre', document.querySelector(`#${settingsContainerId} select[id^='genre']`).value);
+                formData.append('mood', document.querySelector(`#${settingsContainerId} select[id^='mood']`).value);
+                formData.append('duration', document.querySelector(`#${settingsContainerId} input[id^='duration']`).value);
+                formData.append('tempo', document.querySelector(`#${settingsContainerId} input[id^='tempo']`).value);
+
+                let endpoint = '';
+                let inputValid = false;
+
+                if (type === 'image') {
+                    if (imageUpload.files.length > 0) {
+                        formData.append('file', imageUpload.files[0]);
+                        endpoint = '/generate/image';
+                        inputValid = true;
+                    } else {
+                        loadingText.textContent = "Please upload an image file.";
+                    }
+                } else if (type === 'text') {
+                    if (textInput.value.trim() !== '') {
+                        formData.append('text', textInput.value.trim());
+                        endpoint = '/generate/text';
+                        inputValid = true;
+                    } else {
+                         loadingText.textContent = "Please enter some text.";
+                    }
+                } else if (type === 'hum') {
+                     if (humUpload.files.length > 0) {
+                        formData.append('file', humUpload.files[0]);
+                        endpoint = '/generate/humming';
+                        inputValid = true;
+                    } else {
+                        loadingText.textContent = "Please upload a humming audio file.";
+                    }
+                }
+
+                if (!inputValid) {
+                    loadingText.classList.remove('text-slate-400', 'animate-pulse');
+                    loadingText.classList.add('text-red-400');
+                    document.querySelector('#loading-state .loader').style.display = 'none';
+                    return;
+                }
+                 document.querySelector('#loading-state .loader').style.display = 'block';
+
+                try {
+                    const response = await fetch(API_BASE_URL + endpoint, {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.detail || `Request failed with status ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    
+                    trackNameEl.textContent = result.caption || `Generated from ${type}`;
+                    audioPlayer.src = API_BASE_URL + result.wav_file;
+                    audioPlayer.load();
+
+                    audioPlayer.oncanplaythrough = () => {
+                        setupPlayer();
+                        downloadBtn.href = API_BASE_URL + result.wav_file;
+                        downloadBtn.download = `ai-music-${type}.wav`;
+                        downloadBtn.classList.remove('hidden');
+
+                        loadingState.style.display = 'none';
+                        playerState.classList.remove('hidden');
+                        
+                        audioPlayer.play();
+                        playIcon.classList.add('hidden');
+                        pauseIcon.classList.remove('hidden');
+                    };
+
+                } catch (error) {
+                    loadingText.textContent = `Error: ${error.message}`;
+                    loadingText.classList.remove('text-slate-400', 'animate-pulse');
+                    loadingText.classList.add('text-red-400');
+                    document.querySelector('#loading-state .loader').style.display = 'none';
+                }
+            };
+            
+            Object.keys(navLinks).forEach(key => {
+                navLinks[key].addEventListener('click', () => switchPage(key));
+            });
+
+            Object.keys(generateButtons).forEach(key => {
+                generateButtons[key].addEventListener('click', () => handleGenerate(key));
+            });
+
+            playPauseBtn.addEventListener('click', () => {
+                if (audioPlayer.paused) {
+                    audioPlayer.play();
+                    playIcon.classList.add('hidden');
+                    pauseIcon.classList.remove('hidden');
+                } else {
+                    audioPlayer.pause();
+                    playIcon.classList.remove('hidden');
+                    pauseIcon.classList.add('hidden');
+                }
+            });
+
+            progressBar.addEventListener('input', (e) => {
+                audioPlayer.currentTime = e.target.value;
+            });
+            
+            audioPlayer.addEventListener('timeupdate', updatePlayerUI);
+            audioPlayer.addEventListener('loadedmetadata', setupPlayer);
+
+            imageDropzone.addEventListener('click', () => imageUpload.click());
+            imageUpload.addEventListener('change', (e) => handleFileSelect(e.target.files[0], 'image'));
+
+            imageDropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                imageDropzone.classList.add('border-indigo-400');
+            });
+            imageDropzone.addEventListener('dragleave', () => {
+                imageDropzone.classList.remove('border-indigo-400');
+            });
+            imageDropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                imageDropzone.classList.remove('border-indigo-400');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    imageUpload.files = files;
+                    handleFileSelect(files[0], 'image');
+                }
+            });
+
+            humUpload.addEventListener('change', (e) => handleFileSelect(e.target.files[0], 'hum'));
+            
+            lucide.createIcons();
+            switchPage('image');
+        });
+    </script>
+</body>
+</html>
+
+```

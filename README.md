@@ -17,6 +17,7 @@ You can fine-tune your output by choosing **genre**, **mood**, **tempo (BPM)**, 
 - 🎧 **Playback & Speed Slider** — Listen, slow down, or speed up playback.  
 - ⚙️ **FastAPI Backend** + **HTML/CSS/JS Frontend** — Easy to run locally.
 
+
 ---
 
 ## 🧰 Tech Stack

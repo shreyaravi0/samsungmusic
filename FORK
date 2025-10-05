@@ -1,0 +1,64 @@
+🎵 Music Generator
+🧑‍💻 Team Details - Team FORK - RV COLLEGE OF ENGINEERING
+Shreya Ravi - 1RV23CD051 
+Aditya K - 1RV23AI130
+Ansh Ravi Kashyap - 1RV23CS040
+Poorvi Bellur - 1RV23CD037
+
+
+📘 Project Overview
+
+The Music Generator is an AI-powered creative tool that synthesizes original musical compositions from text prompts, images, or even humming audio inputs.
+
+It bridges the gap between linguistic, visual, and acoustic creativity, allowing users to express emotions, moods, and themes through music generated dynamically using deep learning models.
+
+
+| Component        | Description                                                |
+| ---------------- | ---------------------------------------------------------- |
+| Backend          | FastAPI – lightweight, asynchronous Python framework       |
+| ML Models        | BLIP (Image Captioning), Transformers (Text-to-Music)      |
+| Music Processing | Music21 library for note/chord generation                  |
+| Audio Synthesis  | FluidSynth using GeneralUser GS SoundFont                  |
+| Frontend         | HTML, CSS, JavaScript                                      |
+| Integration      | CORS + REST API communication between frontend and backend |
+
+
+🎯 Features
+
+🎶 Text to Music: Generate melodies using descriptive language.
+
+🖼️ Image to Music: Upload an image; AI captions and generates a melody.
+
+🎤 Humming Input: Convert simple humming into structured music.
+
+🎚️ Playback Controls: Adjust speed and duration of playback.
+
+💾 Downloadable Output: Save the final composition as a WAV file.
+
+🎼 Note Visualization: Display generated notes on screen.
+
+🎛️ Mood/Genre Filters: Tailor the composition to emotion or style.
+
+⏱️ BPM & Duration Settings: User-controlled rhythm and length.
+
+
+📌 Important Notes for Reviewers
+
+Installation & Setup:
+Please refer to the README.md in this repository for detailed instructions on how to install dependencies, set up the environment, download the SoundFont, and run the backend/frontend.
+
+Accessing Outputs:
+The static/ folder contains generated WAV and MP3 files from example text, image, and humming inputs. You can listen to these to evaluate the project.
+
+Presentation & Documentation:
+The submissions/ folder includes the PPT slides and any supporting documents that summarize project objectives, architecture, and results.
+
+Recommended Evaluation:
+
+Follow the README to launch the project.
+
+Test the text, image, and humming inputs.
+
+Adjust playback speed, mood, genre, and duration to explore full functionality.
+
+Listen to generated audio and view notes visualization.
